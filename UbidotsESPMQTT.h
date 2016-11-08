@@ -1,0 +1,75 @@
+/*
+Copyright (c) 2016 Ubidots.
+
+Permission is hereby granted, free of charge, to any person obtaining
+a copy of this software and associated documentation files (the
+"Software"), to deal in the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to
+the following conditions:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+Oriiginal Maker: Mateo Velez - Metavix for Ubidots Inc
+Modified by: Jose Garcia
+
+*/
+
+#ifndef UbidotsESPMQTT_H
+#define UbidotsESPMQTT_H
+#include "PubSubClient.h"
+#include <ESP8266WiFi.h>
+
+
+#define MQTT_PORT 1883
+#define SERVER "things.ubidots.com"
+#define MAX_VALUES 5
+#define FIRST_PART_TOPIC "/v1.6/devices/"
+#define DEFAULT_DEVICE_LABEL "ESP8266"
+
+
+#define META_DEBUG Serial
+
+typedef struct Value {
+    char *_sourceLabel;
+    char  *_variableLabel;
+    float _value;
+    char *_context;
+} Value;
+
+
+
+class Ubidots {
+ private:
+    void (*callback)(char*,uint8_t*,unsigned int);
+    WiFiClient espClient;
+    PubSubClient _client = PubSubClient(espClient);
+    char* _clientName;
+    char* _token;
+    uint8_t currentValue;
+    Value * val;
+ 
+ public:
+    Ubidots(char* token, char* clientName);
+    void begin(void (*callback)(char*,uint8_t*,unsigned int));
+    bool connected();
+    bool ubidotsSubscribe(char* deviceLabel, char* variableLabel);
+    bool add(char* sourceLabel, char* variableLabel, float value, char *context = "NULL");
+    bool ubidotsPublish();
+    void reconnect();
+    bool loop();
+    bool wifiConnection(char* ssid, char* pass);
+ 
+};
+
+#endif
