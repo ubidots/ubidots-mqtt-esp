@@ -10,7 +10,8 @@ MQTT library for connecting to Ubidots using MQTT protocol and an ESP8266 chip.
 4. Now, click on Sketch -> Include Library -> Add .ZIP Library
 5. Select the .ZIP file that you have just downloaded and then “Accept” or “Choose”
 6. Go to Sketch/Program -> Include Library -> Library Manager and install the PubSubClient library 
-6. Close the Arduino IDE and open it again.
+7. Close the Arduino IDE and open it again.
+8. If you are using windows, please install the appropiate driver for your ESP board (CH340G if you are using a LoLin board or CP2102 if you are using an AMICA board)
 
 ## Examples
 
