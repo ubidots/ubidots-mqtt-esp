@@ -20,7 +20,7 @@ LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
 OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-Oriiginal Maker: Mateo Velez - Metavix for Ubidots Inc
+Original Maker: Mateo Velez - Metavix for Ubidots Inc
 Modified by: Jose Garcia
 
 */
@@ -33,11 +33,14 @@ Ubidots::Ubidots(char* token, char* clientName) {
     currentValue = 0;
     val = (Value *)malloc(MAX_VALUES*sizeof(Value));
 }
+
+
 void Ubidots::begin(void (*callback)(char*,uint8_t*,unsigned int)) {
     this->callback = callback;
     _client.setServer(SERVER, MQTT_PORT);
     _client.setCallback(callback);
 }
+
 
 bool Ubidots::add(char* sourceLabel, char* variableLabel, float value, char *context) {
     (val+currentValue)->_variableLabel = variableLabel;
@@ -51,6 +54,8 @@ bool Ubidots::add(char* sourceLabel, char* variableLabel, float value, char *con
     }
     return true;
 }
+
+
 bool Ubidots::ubidotsSubscribe(char* deviceLabel, char* variableLabel) {
     char topic[150];
     sprintf(topic, "%s%s/%s/lv", FIRST_PART_TOPIC, deviceLabel, variableLabel);
@@ -60,11 +65,12 @@ bool Ubidots::ubidotsSubscribe(char* deviceLabel, char* variableLabel) {
     }
     return _client.subscribe(topic);
 }
+
+
 bool Ubidots::ubidotsPublish() {
     char topic[150];
     char payload[500];
     String str;
-    Serial.println(currentValue);
     sprintf(payload, "{");
     for (int i = 0; i <= currentValue; ) {
         sprintf(topic, "%s%s", FIRST_PART_TOPIC, (val+i)->_sourceLabel);
@@ -79,15 +85,19 @@ bool Ubidots::ubidotsPublish() {
             sprintf(payload, "%s, ", payload);
         }
     }
+    Serial.print("TOPIC: ");
     Serial.println(topic);
+    Serial.print("JSON dict: ");
     Serial.println(payload);
     currentValue = 0;
     return _client.publish(topic, payload);
 }
 
+
 bool Ubidots::connected(){
     return _client.connected();
 }
+
 
 void Ubidots::reconnect() {
     while (!_client.connected()) {
@@ -102,12 +112,16 @@ void Ubidots::reconnect() {
     }
   }
 }
+
+
 bool Ubidots::loop() {
     if (!_client.connected()) {
         reconnect();
     }
     return _client.loop();
 }
+
+
 bool Ubidots::wifiConnection(char* ssid, char* pass) {
     WiFi.begin(ssid, pass);
     while (WiFi.status() != WL_CONNECTED) {
