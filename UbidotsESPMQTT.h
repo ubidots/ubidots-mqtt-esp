@@ -20,8 +20,7 @@ LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
 OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-Original Maker: Mateo Velez - Metavix for Ubidots Inc
-Modified by: Jose Garcia
+Made by Mateo Velez - Metavix for Ubidots Inc
 
 */
 
@@ -41,10 +40,10 @@ Modified by: Jose Garcia
 #define META_DEBUG Serial
 
 typedef struct Value {
-    char *_sourceLabel;
     char  *_variableLabel;
     float _value;
     char *_context;
+    char *_timestamp;
 } Value;
 
 
@@ -54,17 +53,17 @@ class Ubidots {
     void (*callback)(char*,uint8_t*,unsigned int);
     WiFiClient espClient;
     PubSubClient _client = PubSubClient(espClient);
-    char* _clientName;
     char* _token;
     uint8_t currentValue;
     Value * val;
  
  public:
-    Ubidots(char* token, char* clientName);
+    Ubidots(char* token);
     void begin(void (*callback)(char*,uint8_t*,unsigned int));
-    bool connected();
     bool ubidotsSubscribe(char* deviceLabel, char* variableLabel);
-    bool add(char* sourceLabel, char* variableLabel, float value, char *context = "NULL");
+    bool add(char* variableLabel, float value);
+    bool add(char* variableLabel, float value, char *context);
+    bool add(char* variableLabel, float value, char *context, char *timestamp);
     bool ubidotsPublish();
     void reconnect();
     bool loop();
