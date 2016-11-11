@@ -25,126 +25,52 @@ Modified by: Jose Garcia
 
 */
 
-#include "UbidotsESPMQTT.h"
-
-Ubidots::Ubidots(char* token, char* clientName) {
-    _token = token;  // This is to get the token
-    _clientName = clientName;
-    currentValue = 0;
-    val = (Value *)malloc(MAX_VALUES*sizeof(Value));
-}
+#ifndef UbidotsESPMQTT_H
+#define UbidotsESPMQTT_H
+#include "PubSubClient.h"
+#include <ESP8266WiFi.h>
 
 
-void Ubidots::begin(void (*callback)(char*,uint8_t*,unsigned int)) {
-    this->callback = callback;
-    _client.setServer(SERVER, MQTT_PORT);
-    _client.setCallback(callback);
-}
+#define MQTT_PORT 1883
+#define SERVER "things.ubidots.com"
+#define MAX_VALUES 5
+#define FIRST_PART_TOPIC "/v1.6/devices/"
+#define DEFAULT_DEVICE_LABEL "ESP8266"
 
 
-bool Ubidots::add(char* variableLabel, float value) {
-    return add(variableLabel, value, "NULL", "NULL");
-}
+#define META_DEBUG Serial
+
+typedef struct Value {
+    char  *_variableLabel;
+    float _value;
+    char *_context;
+    char *_timestamp;
+} Value;
 
 
-bool Ubidots::add(char* variableLabel, float value, char *context) {
-    return add(variableLabel, value, context, "NULL");
-}
 
+class Ubidots {
+ private:
+    void (*callback)(char*,uint8_t*,unsigned int);
+    WiFiClient espClient;
+    PubSubClient _client = PubSubClient(espClient);
+    char* _clientName;
+    char* _token;
+    uint8_t currentValue;
+    Value * val;
+ 
+ public:
+    Ubidots(char* token, char* clientName);
+    void begin(void (*callback)(char*,uint8_t*,unsigned int));
+    bool connected();
+    bool ubidotsSubscribe(char* deviceLabel, char* variableLabel);
+    bool add(char* variableLabel, float value);
+    bool add(char* variableLabel, float value, char *context);
+    bool add(char* variableLabel, float value, char *context, char *timestamp);
+    bool ubidotsPublish(char *sourceLabel);
+    void reconnect();
+    bool loop();
+    bool wifiConnection(char* ssid, char* pass);
+};
 
-bool Ubidots::add(char* variableLabel, float value, char *context, char *timestamp) {
-    (val+currentValue)->_variableLabel = variableLabel;
-    (val+currentValue)->_value = value;
-    (val+currentValue)->_context = context;
-    (val+currentValue)->_timestamp = timestamp;
-    currentValue++;
-    if (currentValue > MAX_VALUES) {
-        Serial.println(F("You are sending more than the maximum of consecutive variables"));
-        currentValue = MAX_VALUES;
-    }
-    return true;
-}
-
-
-bool Ubidots::ubidotsSubscribe(char* deviceLabel, char* variableLabel) {
-    char topic[150];
-    sprintf(topic, "%s%s/%s/lv", FIRST_PART_TOPIC, deviceLabel, variableLabel);
-    Serial.println(topic);
-    if (!_client.connected()) {
-        reconnect();
-    }
-    return _client.subscribe(topic);
-}
-
-
-bool Ubidots::ubidotsPublish(char *sourceLabel) {
-    char topic[150];
-    char payload[500];
-    String str;
-    sprintf(topic, "%s%s", FIRST_PART_TOPIC, sourceLabel);
-    sprintf(payload, "{");
-    for (int i = 0; i <= currentValue; ) {
-        str = String((val+i)->_value, 2);
-        Serial.println(str);
-        sprintf(payload, "%s\"%s\": [{\"value\": %s", payload, (val+i)->_variableLabel, str.c_str());
-        if ((val+i)->_timestamp != "NULL") {
-            sprintf(payload, "%s, \"timestamp\": %s", payload, (val+i)->_timestamp);
-        }
-        if ((val+i)->_context != "NULL") {
-            sprintf(payload, "%s, \"context\": {%s}", payload, (val+i)->_context);
-        }
-        i++;
-        if (i >= currentValue) {
-            sprintf(payload, "%s}]}", payload);
-            break;
-        } else {
-            sprintf(payload, "%s}], ", payload);
-        }
-    }
-    Serial.print("TOPIC: ");
-    Serial.println(topic);
-    Serial.print("JSON dict: ");
-    Serial.println(payload);
-    currentValue = 0;
-    return _client.publish(topic, payload);
-}
-
-
-bool Ubidots::connected(){
-    return _client.connected();
-}
-
-
-void Ubidots::reconnect() {
-    while (!_client.connected()) {
-        Serial.print("Attempting MQTT connection...");
-        if (_client.connect(_clientName, _token, NULL)) {
-            Serial.println("connected");
-    } else {
-      Serial.print("failed, rc=");
-      Serial.print(_client.state());
-      Serial.println(" try again in 3 seconds");
-      delay(3000);
-    }
-  }
-}
-
-
-bool Ubidots::loop() {
-    if (!_client.connected()) {
-        reconnect();
-    }
-    return _client.loop();
-}
-
-
-bool Ubidots::wifiConnection(char* ssid, char* pass) {
-    WiFi.begin(ssid, pass);
-    while (WiFi.status() != WL_CONNECTED) {
-        delay(500);
-        Serial.print(".");
-    }
-    Serial.println(F("WiFi connected"));
-    Serial.println(F("IP address: "));
-    Serial.println(WiFi.localIP());
-}
+#endif
