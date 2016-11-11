@@ -31,10 +31,12 @@ Ubidots(char* token, char* clientName)
 ```
 add(char* variableLabel, float value, char *context, char *timestamp);
 ```
-> Add a variable with a value, context and timestamp to be sent to a certain data source, once you use add() you can publish your variable using the ubidotsPublish() method. You can add 5 variables maximum before of publish them. 
+> Add a variable with a value, context and timestamp to be sent to a certain data source, once you use add() you can publish your variable using the ubidotsPublish() method. You can add 5 variables maximum before of publish them.
+ 
 ```
 begin(void (*callback)(char*,uint8_t*,unsigned int));
 ```
+
 > Sets the callback function for subscribed topics
 
 ```
