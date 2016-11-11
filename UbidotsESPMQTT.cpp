@@ -20,20 +20,17 @@ LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
 OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-Original Maker: Mateo Velez - Metavix for Ubidots Inc
-Modified by: Jose Garcia
+Made by Mateo Velez - Metavix for Ubidots Inc
 
 */
 
 #include "UbidotsESPMQTT.h"
 
-Ubidots::Ubidots(char* token, char* clientName) {
-    _token = token;  // This is to get the token
-    _clientName = clientName;
+Ubidots::Ubidots(char* token) {
+    _token = token;
     currentValue = 0;
     val = (Value *)malloc(MAX_VALUES*sizeof(Value));
 }
-
 
 void Ubidots::begin(void (*callback)(char*,uint8_t*,unsigned int)) {
     this->callback = callback;
@@ -41,7 +38,11 @@ void Ubidots::begin(void (*callback)(char*,uint8_t*,unsigned int)) {
     _client.setCallback(callback);
 }
 
+bool Ubidots::add(char* variableLabel, float value) {
+    return add(variableLabel, value, "NULL", "NULL");
+}
 
+<<<<<<< HEAD
 bool Ubidots::add(char* variableLabel, float value) {
     return add(variableLabel, value, "NULL", "NULL");
 }
@@ -52,6 +53,12 @@ bool Ubidots::add(char* variableLabel, float value, char *context) {
 }
 
 
+=======
+bool Ubidots::add(char* variableLabel, float value, char *context) {
+    return add(variableLabel, value, context, "NULL");    
+}
+
+>>>>>>> origin/master
 bool Ubidots::add(char* variableLabel, float value, char *context, char *timestamp) {
     (val+currentValue)->_variableLabel = variableLabel;
     (val+currentValue)->_value = value;
@@ -65,17 +72,16 @@ bool Ubidots::add(char* variableLabel, float value, char *context, char *timesta
     return true;
 }
 
-
 bool Ubidots::ubidotsSubscribe(char* deviceLabel, char* variableLabel) {
     char topic[150];
     sprintf(topic, "%s%s/%s/lv", FIRST_PART_TOPIC, deviceLabel, variableLabel);
-    Serial.println(topic);
     if (!_client.connected()) {
         reconnect();
     }
     return _client.subscribe(topic);
 }
 
+<<<<<<< HEAD
 
 bool Ubidots::ubidotsPublish(char *sourceLabel) {
     char topic[150];
@@ -86,6 +92,16 @@ bool Ubidots::ubidotsPublish(char *sourceLabel) {
     for (int i = 0; i <= currentValue; ) {
         str = String((val+i)->_value, 2);
         Serial.println(str);
+=======
+bool Ubidots::ubidotsPublish() {
+    char topic[150];
+    char payload[500];
+    String str;
+    sprintf(topic, "%sESP8266", FIRST_PART_TOPIC);
+    sprintf(payload, "{");
+    for (int i = 0; i <= currentValue; ) {
+        str = String((val+i)->_value, 2);
+>>>>>>> origin/master
         sprintf(payload, "%s\"%s\": [{\"value\": %s", payload, (val+i)->_variableLabel, str.c_str());
         if ((val+i)->_timestamp != "NULL") {
             sprintf(payload, "%s, \"timestamp\": %s", payload, (val+i)->_timestamp);
@@ -101,24 +117,14 @@ bool Ubidots::ubidotsPublish(char *sourceLabel) {
             sprintf(payload, "%s}], ", payload);
         }
     }
-    Serial.print("TOPIC: ");
-    Serial.println(topic);
-    Serial.print("JSON dict: ");
-    Serial.println(payload);
     currentValue = 0;
     return _client.publish(topic, payload);
 }
 
-
-bool Ubidots::connected(){
-    return _client.connected();
-}
-
-
 void Ubidots::reconnect() {
     while (!_client.connected()) {
         Serial.print("Attempting MQTT connection...");
-        if (_client.connect(_clientName, _token, NULL)) {
+        if (_client.connect("ESP8266", _token, NULL)) {
             Serial.println("connected");
     } else {
       Serial.print("failed, rc=");
@@ -128,16 +134,12 @@ void Ubidots::reconnect() {
     }
   }
 }
-
-
 bool Ubidots::loop() {
     if (!_client.connected()) {
         reconnect();
     }
     return _client.loop();
 }
-
-
 bool Ubidots::wifiConnection(char* ssid, char* pass) {
     WiFi.begin(ssid, pass);
     while (WiFi.status() != WL_CONNECTED) {
