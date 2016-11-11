@@ -13,6 +13,55 @@ MQTT library for connecting to Ubidots using MQTT protocol and an ESP8266 chip.
 7. Close the Arduino IDE and open it again.
 8. If you are using windows, please install the appropiate driver for your ESP board (CH340G if you are using a LoLin board or CP2102 if you are using an AMICA board)
 
-## Examples
+# Documentation
+
+## Constructor
+
+### Ubidots
+
+```
+Ubidots(char* token, char* clientName)
+```
+> Creates an Ubidots instance, you must setup as input your Ubidots TOKEN and a MQTT client name, the name must be unique so we recommend you to insert random ASCII characters.
+
+## Methods
+
+### Ubidots
+
+```
+add(char* variableLabel, float value, char *context, char *timestamp);
+```
+> Add a variable with a value, context and timestamp to be sent to a certain data source, once you use add() you can publish your variable using the ubidotsPublish() method. You can add 5 variables maximum before of publish them. 
+```
+begin(void (*callback)(char*,uint8_t*,unsigned int));
+```
+> Sets the callback function for subscribed topics
+
+```
+connected();
+```
+> Returns True if the device is connected to the MQTT broker
+
+```
+loop();
+```
+> Infinite loop for MQTT connection, insert it at the end of your routine
+
+```
+reconnect();
+```
+> For trying to make a reconnection every 5 seconds if the connection is lost.
+
+```
+ubidotsSubscribe(char* deviceLabel, char* variableLabel);
+```
+> Subscribe to the specified device label and variable label of your Ubidots account.
+
+```
+wifiConnection(char* ssid, char* pass);
+```
+> Connect via Wifi to the specified SSID.
+
+# Examples
 
 Please refer to examples folder.

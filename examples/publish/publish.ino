@@ -44,9 +44,13 @@ void loop() {
   if(!client.connected()){
       client.reconnect();
       }
-  client.add("esp8266", "stuff", 10.2); //Insert your dataSource and variable Labels and the value to be sent
-  client.add("esp8266-2", "more-stuff", 120.2);
-  client.ubidotsPublish();  
+  
+  // Publish values to 2 different data sources
+  
+  client.add("stuff", 10.2); //Insert your variable Labels and the value to be sent
+  client.ubidotsPublish("source1");
+  client.add("stuff", 10.2);
+  client.add("more-stuff", 120.2);
+  client.ubidotsPublish("source2");
   client.loop();
-  delay(1000);
   }

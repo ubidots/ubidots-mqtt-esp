@@ -42,11 +42,21 @@ void Ubidots::begin(void (*callback)(char*,uint8_t*,unsigned int)) {
 }
 
 
-bool Ubidots::add(char* sourceLabel, char* variableLabel, float value, char *context) {
+bool Ubidots::add(char* variableLabel, float value) {
+    return add(variableLabel, value, "NULL", "NULL");
+}
+
+
+bool Ubidots::add(char* variableLabel, float value, char *context) {
+    return add(variableLabel, value, context, "NULL");
+}
+
+
+bool Ubidots::add(char* variableLabel, float value, char *context, char *timestamp) {
     (val+currentValue)->_variableLabel = variableLabel;
-    (val+currentValue)->_sourceLabel = sourceLabel;
     (val+currentValue)->_value = value;
-    (val+currentValue)->_context = context;    
+    (val+currentValue)->_context = context;
+    (val+currentValue)->_timestamp = timestamp;
     currentValue++;
     if (currentValue > MAX_VALUES) {
         Serial.println(F("You are sending more than the maximum of consecutive variables"));
@@ -67,22 +77,28 @@ bool Ubidots::ubidotsSubscribe(char* deviceLabel, char* variableLabel) {
 }
 
 
-bool Ubidots::ubidotsPublish() {
+bool Ubidots::ubidotsPublish(char *sourceLabel) {
     char topic[150];
     char payload[500];
     String str;
+    sprintf(topic, "%s%s", FIRST_PART_TOPIC, sourceLabel);
     sprintf(payload, "{");
     for (int i = 0; i <= currentValue; ) {
-        sprintf(topic, "%s%s", FIRST_PART_TOPIC, (val+i)->_sourceLabel);
         str = String((val+i)->_value, 2);
         Serial.println(str);
-        sprintf(payload, "%s\"%s\": %s", payload, (val+i)->_variableLabel, str.c_str());
+        sprintf(payload, "%s\"%s\": [{\"value\": %s", payload, (val+i)->_variableLabel, str.c_str());
+        if ((val+i)->_timestamp != "NULL") {
+            sprintf(payload, "%s, \"timestamp\": %s", payload, (val+i)->_timestamp);
+        }
+        if ((val+i)->_context != "NULL") {
+            sprintf(payload, "%s, \"context\": {%s}", payload, (val+i)->_context);
+        }
         i++;
         if (i >= currentValue) {
-            sprintf(payload, "%s}", payload);
+            sprintf(payload, "%s}]}", payload);
             break;
         } else {
-            sprintf(payload, "%s, ", payload);
+            sprintf(payload, "%s}], ", payload);
         }
     }
     Serial.print("TOPIC: ");

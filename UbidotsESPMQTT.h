@@ -41,10 +41,10 @@ Modified by: Jose Garcia
 #define META_DEBUG Serial
 
 typedef struct Value {
-    char *_sourceLabel;
     char  *_variableLabel;
     float _value;
     char *_context;
+    char *_timestamp;
 } Value;
 
 
@@ -61,15 +61,16 @@ class Ubidots {
  
  public:
     Ubidots(char* token, char* clientName);
+    bool add(char* variableLabel, float value);
+    bool add(char* variableLabel, float value, char *context);
+    bool add(char* variableLabel, float value, char *context, char *timestamp);
     void begin(void (*callback)(char*,uint8_t*,unsigned int));
     bool connected();
-    bool ubidotsSubscribe(char* deviceLabel, char* variableLabel);
-    bool add(char* sourceLabel, char* variableLabel, float value, char *context = "NULL");
-    bool ubidotsPublish();
-    void reconnect();
     bool loop();
+    void reconnect();
+    bool ubidotsPublish(char *sourceLabel);
+    bool ubidotsSubscribe(char* deviceLabel, char* variableLabel);
     bool wifiConnection(char* ssid, char* pass);
- 
 };
 
 #endif
