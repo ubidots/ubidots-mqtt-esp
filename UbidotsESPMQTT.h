@@ -58,7 +58,7 @@ class Ubidots {
     char* _token;
     uint8_t currentValue;
     char* _server;
-    bool _debug = true;
+    bool _debug = false;
     Value * val;
  
  public:
@@ -71,7 +71,7 @@ class Ubidots {
     bool loop();
     bool ubidotsSubscribe(char* deviceLabel, char* variableLabel);
     bool ubidotsPublish(char *sourceLabel);
-    void ubidotsSetBusiness(bool business);
+    void ubidotsSetBroker(char* broker);
     void reconnect();
     void setDebug(bool debug);
     bool wifiConnection(char* ssid, char* pass);

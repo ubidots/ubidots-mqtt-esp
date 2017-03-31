@@ -154,17 +154,13 @@ bool Ubidots::wifiConnection(char* ssid, char* pass) {
     Serial.println(WiFi.localIP());
 }
 
-void Ubidots::ubidotsSetBusiness(bool business){
-    if (business){
-        if (_debug){
-            Serial.println("Broker set for Business Account");
-        }
-        _server = "business.api.ubidots.com";
+void Ubidots::ubidotsSetBroker(char* broker){
+    if (_debug){
+        Serial.println("Broker set for Business Account");
     }
-    else{
-        _server = SERVER;
-    }
+    _server = broker;
 }
+
 
 void Ubidots::setDebug(bool debug){
     _debug = debug;
