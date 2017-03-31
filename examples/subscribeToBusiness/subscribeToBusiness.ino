@@ -33,7 +33,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
 
 void setup() {
   // put your setup code here, to run once:
-  client.ubidotsSetBusiness(true); // Insert a true bool value to this function if your account is for Business
+  client.ubidotsSetBroker("business.api.ubidots.com"); // Sets the broker properly for the business account
   client.setDebug(false); // Pass a true or false bool value to activate debug messages
   Serial.begin(115200);
   client.wifiConnection(WIFINAME, WIFIPASS);

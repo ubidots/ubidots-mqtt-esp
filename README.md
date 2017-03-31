@@ -55,11 +55,10 @@ reconnect();
 > For trying to make a reconnection every 5 seconds if the connection is lost.
 
 ```
-ubidotsSetBusiness(bool business);
+ubidotsSetBroker(char* broker);
 ```
-> Sets the broker properly for publish ans subscribe to Business accounts. If your account if a business one, set a
-true bool value for this function in before calling any function of the Ubidots client, see examples for more information.
-By default, broker will be set to publish and subscribe to free educational version accounts.
+> Sets the broker properly for publish and subscribe to Ubidots accounts. If your account if a business one, set "business.api.ubidots.com" or the endpoint provided by Ubidots as your broker, see examples for more information.
+By default, broker will be set to publish and subscribe to free educational version accounts with broker "things.ubidots.com".
 
 ```
 ubidotsSubscribe(char* deviceLabel, char* variableLabel);
