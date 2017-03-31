@@ -57,19 +57,23 @@ class Ubidots {
     char* _clientName;
     char* _token;
     uint8_t currentValue;
+    char* _server;
+    bool _debug = true;
     Value * val;
  
  public:
     Ubidots(char* token, char* clientName);
-    void begin(void (*callback)(char*,uint8_t*,unsigned int));
-    bool connected();
-    bool ubidotsSubscribe(char* deviceLabel, char* variableLabel);
     bool add(char* variableLabel, float value);
     bool add(char* variableLabel, float value, char *context);
     bool add(char* variableLabel, float value, char *context, char *timestamp);
-    bool ubidotsPublish(char *sourceLabel);
-    void reconnect();
+    void begin(void (*callback)(char*,uint8_t*,unsigned int));
+    bool connected();
     bool loop();
+    bool ubidotsSubscribe(char* deviceLabel, char* variableLabel);
+    bool ubidotsPublish(char *sourceLabel);
+    void ubidotsSetBusiness(bool business);
+    void reconnect();
+    void setDebug(bool debug);
     bool wifiConnection(char* ssid, char* pass);
 };
 

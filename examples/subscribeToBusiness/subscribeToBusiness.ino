@@ -11,7 +11,6 @@
 #define WIFIPASS "....." // Your Wifi Pass
 #define MQTTCLIENTNAME "....." // Your MQTT Client Name, it must be unique so we recommend to choose a random ASCCI name
 
-
 Ubidots client(TOKEN, MQTTCLIENTNAME);
 
 /****************************************
@@ -34,8 +33,9 @@ void callback(char* topic, byte* payload, unsigned int length) {
 
 void setup() {
   // put your setup code here, to run once:
+  client.ubidotsSetBusiness(true); // Insert a true bool value to this function if your account is for Business
+  client.setDebug(false); // Pass a true or false bool value to activate debug messages
   Serial.begin(115200);
-  client.setDebug(true); // Pass a true or false bool value to activate debug messages
   client.wifiConnection(WIFINAME, WIFIPASS);
   client.begin(callback);
   client.ubidotsSubscribe("esp8266","temperature"); //Insert the dataSource and Variable's Labels
