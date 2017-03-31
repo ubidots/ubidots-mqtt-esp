@@ -41,6 +41,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(115200);
+  client.setDebug(true); // Pass a true or false bool value to activate debug messages
   client.wifiConnection(WIFINAME, WIFIPASS);
   client.begin(callback);
   pinMode(16, OUTPUT);

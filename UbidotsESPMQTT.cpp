@@ -21,13 +21,14 @@ OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 Original Maker: Mateo Velez - Metavix for Ubidots Inc
-Modified by: Jose Garcia
+Modified and Maintened by: Jose Garcia - Ubidots Inc
 
 */
 
 #include "UbidotsESPMQTT.h"
 
 Ubidots::Ubidots(char* token, char* clientName) {
+    _server = SERVER;
     _token = token;  // This is to get the token
     _clientName = clientName;
     currentValue = 0;
@@ -37,7 +38,7 @@ Ubidots::Ubidots(char* token, char* clientName) {
 
 void Ubidots::begin(void (*callback)(char*,uint8_t*,unsigned int)) {
     this->callback = callback;
-    _client.setServer(SERVER, MQTT_PORT);
+    _client.setServer(_server, MQTT_PORT);
     _client.setCallback(callback);
 }
 
@@ -69,9 +70,12 @@ bool Ubidots::add(char* variableLabel, float value, char *context, char *timesta
 bool Ubidots::ubidotsSubscribe(char* deviceLabel, char* variableLabel) {
     char topic[150];
     sprintf(topic, "%s%s/%s/lv", FIRST_PART_TOPIC, deviceLabel, variableLabel);
-    Serial.println(topic);
     if (!_client.connected()) {
         reconnect();
+    }
+    if (_debug){
+        Serial.println("Subscribed to: ");
+        Serial.println(topic);
     }
     return _client.subscribe(topic);
 }
@@ -85,7 +89,6 @@ bool Ubidots::ubidotsPublish(char *sourceLabel) {
     sprintf(payload, "{");
     for (int i = 0; i <= currentValue; ) {
         str = String((val+i)->_value, 2);
-        Serial.println(str);
         sprintf(payload, "%s\"%s\": [{\"value\": %s", payload, (val+i)->_variableLabel, str.c_str());
         if ((val+i)->_timestamp != "NULL") {
             sprintf(payload, "%s, \"timestamp\": %s", payload, (val+i)->_timestamp);
@@ -101,10 +104,12 @@ bool Ubidots::ubidotsPublish(char *sourceLabel) {
             sprintf(payload, "%s}], ", payload);
         }
     }
-    Serial.print("TOPIC: ");
-    Serial.println(topic);
-    Serial.print("JSON dict: ");
-    Serial.println(payload);
+    if (_debug){
+        Serial.println("publishing to TOPIC: ");
+        Serial.println(topic);
+        Serial.print("JSON dict: ");
+        Serial.println(payload);
+    }
     currentValue = 0;
     return _client.publish(topic, payload);
 }
@@ -147,4 +152,20 @@ bool Ubidots::wifiConnection(char* ssid, char* pass) {
     Serial.println(F("WiFi connected"));
     Serial.println(F("IP address: "));
     Serial.println(WiFi.localIP());
+}
+
+void Ubidots::ubidotsSetBusiness(bool business){
+    if (business){
+        if (_debug){
+            Serial.println("Broker set for Business Account");
+        }
+        _server = "business.api.ubidots.com";
+    }
+    else{
+        _server = SERVER;
+    }
+}
+
+void Ubidots::setDebug(bool debug){
+    _debug = debug;
 }
