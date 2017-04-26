@@ -9,10 +9,8 @@
 #define TOKEN "....." // Your Ubidots TOKEN
 #define WIFINAME "...." //Your SSID
 #define WIFIPASS "....." // Your Wifi Pass
-#define MQTTCLIENTNAME "....." // Your MQTT Client Name, it must be unique so we recommend to choose a random ASCCI name
 
-
-Ubidots client(TOKEN, MQTTCLIENTNAME);
+Ubidots client(TOKEN);
 
 /****************************************
  * Auxiliar Functions
