@@ -27,12 +27,14 @@ Modified and Maintened by: Jose Garcia - Ubidots Inc
 
 #include "UbidotsESPMQTT.h"
 
+
+Ubidots::Ubidots(char* token){
+    initialize(token, NULL);
+}
+
+
 Ubidots::Ubidots(char* token, char* clientName) {
-    _server = SERVER;
-    _token = token;  // This is to get the token
-    _clientName = clientName;
-    currentValue = 0;
-    val = (Value *)malloc(MAX_VALUES*sizeof(Value));
+    initialize(token, clientName);
 }
 
 
@@ -64,6 +66,70 @@ bool Ubidots::add(char* variableLabel, float value, char *context, char *timesta
         currentValue = MAX_VALUES;
     }
     return true;
+}
+
+
+bool Ubidots::connected(){
+    return _client.connected();
+}
+
+
+char* Ubidots::getMac(){
+    // Obtains the MAC of the device
+    Serial.println("entra");
+    byte mac[6];
+    WiFi.macAddress(mac);
+    char macAddr[18];
+    sprintf(macAddr, "%2X%2X%2X%2X%2X%2X", mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
+    return macAddr;
+}
+
+
+void Ubidots::initialize(char* token, char* clientName){
+    _server = SERVER;
+    _token = token;
+    currentValue = 0;
+    val = (Value *)malloc(MAX_VALUES*sizeof(Value));
+    if(clientName!=NULL){
+        _clientName = clientName;
+    }
+}
+
+
+bool Ubidots::loop() {
+    if (!_client.connected()) {
+        reconnect();
+    }
+    return _client.loop();
+}
+
+
+void Ubidots::reconnect() {
+    while (!_client.connected()) {
+        Serial.print("Attempting MQTT connection...");
+        if (_client.connect(_clientName, _token, NULL)) {
+            Serial.println("connected");
+            break;
+    } else {
+      Serial.print("failed, rc=");
+      Serial.print(_client.state());
+      Serial.println(" try again in 3 seconds");
+      delay(3000);
+    }
+  }
+}
+
+
+void Ubidots::setDebug(bool debug){
+    _debug = debug;
+}
+
+
+void Ubidots::ubidotsSetBroker(char* broker){
+    if (_debug){
+        Serial.println("Broker set for Business Account");
+    }
+    _server = broker;
 }
 
 
@@ -111,35 +177,7 @@ bool Ubidots::ubidotsPublish(char *sourceLabel) {
         Serial.println(payload);
     }
     currentValue = 0;
-    return _client.publish(topic, payload);
-}
-
-
-bool Ubidots::connected(){
-    return _client.connected();
-}
-
-
-void Ubidots::reconnect() {
-    while (!_client.connected()) {
-        Serial.print("Attempting MQTT connection...");
-        if (_client.connect(_clientName, _token, NULL)) {
-            Serial.println("connected");
-    } else {
-      Serial.print("failed, rc=");
-      Serial.print(_client.state());
-      Serial.println(" try again in 3 seconds");
-      delay(3000);
-    }
-  }
-}
-
-
-bool Ubidots::loop() {
-    if (!_client.connected()) {
-        reconnect();
-    }
-    return _client.loop();
+    return _client.publish(topic, payload, 512);
 }
 
 
@@ -152,16 +190,9 @@ bool Ubidots::wifiConnection(char* ssid, char* pass) {
     Serial.println(F("WiFi connected"));
     Serial.println(F("IP address: "));
     Serial.println(WiFi.localIP());
-}
-
-void Ubidots::ubidotsSetBroker(char* broker){
-    if (_debug){
-        Serial.println("Broker set for Business Account");
+    if(_clientName==NULL){
+        _clientName = getMac();
     }
-    _server = broker;
 }
 
 
-void Ubidots::setDebug(bool debug){
-    _debug = debug;
-}

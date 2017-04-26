@@ -30,7 +30,6 @@ Modified by: Jose Garcia
 #include "PubSubClient.h"
 #include <ESP8266WiFi.h>
 
-
 #define MQTT_PORT 1883
 #define SERVER "things.ubidots.com"
 #define MAX_VALUES 5
@@ -52,16 +51,21 @@ typedef struct Value {
 class Ubidots {
  private:
     void (*callback)(char*,uint8_t*,unsigned int);
+    char* getMac();
+    void initialize(char* token, char* clientName);
     WiFiClient espClient;
     PubSubClient _client = PubSubClient(espClient);
-    char* _clientName;
-    char* _token;
-    uint8_t currentValue;
-    char* _server;
+    char* _clientName = NULL;
     bool _debug = false;
+    uint8_t currentValue;
+    char* _password;
+    char* _server;
+    char* _ssid;
+    char* _token;
     Value * val;
  
  public:
+    Ubidots(char* token);
     Ubidots(char* token, char* clientName);
     bool add(char* variableLabel, float value);
     bool add(char* variableLabel, float value, char *context);

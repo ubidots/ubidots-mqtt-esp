@@ -20,9 +20,10 @@ MQTT library for connecting to Ubidots using MQTT protocol and an ESP8266 chip.
 ### Ubidots
 
 ```
+Ubidots(char* token)
 Ubidots(char* token, char* clientName)
 ```
-> Creates an Ubidots instance, you must setup as input your Ubidots TOKEN and a MQTT client name, the name must be unique so we recommend you to insert random ASCII characters.
+> Creates an Ubidots instance, you must setup as input your Ubidots TOKEN, the MQTT client name is optional and must be unique so we recommend you to insert random ASCII characters if you decide to use it, if you don't pass the clientName as parameter to the constructor the library will try to get the MAC of the device as default client name.
 
 ## Methods
 
@@ -31,8 +32,8 @@ Ubidots(char* token, char* clientName)
 ```
 add(char* variableLabel, float value, char *context, char *timestamp);
 ```
-> Add a variable with a value, context and timestamp to be sent to a certain data source, once you use add() you can publish your variable using the ubidotsPublish() method. You can add 5 variables maximum before of publish them.
- 
+> Add a variable with a value, context and timestamp to be sent to a certain data source, once you use add() you can publish your variable using the ubidotsPublish() method. You can add 5 variables maximum before of publish them. 
+**Important:** As this library depends on a Pubsubclient client, the max length of the JSON dictionary to send by default is 128 bytes, if you want to publish more than 3 variables and they have context or long names you should set at PubSubclient.h the MQTT_MAX_PACKET_SIZE to 512, you can see on your serial console the dictionary to POST if you call the ```setDebug(bool debug)``` method and pass a true value to it. For more information, refer to the PubSubclient official library: https://github.com/knolleary/pubsubclient
 ```
 begin(void (*callback)(char*,uint8_t*,unsigned int));
 ```
@@ -59,6 +60,11 @@ ubidotsSetBroker(char* broker);
 ```
 > Sets the broker properly for publish and subscribe to Ubidots accounts. If your account if a business one, set "business.api.ubidots.com" or the endpoint provided by Ubidots as your broker, see examples for more information.
 By default, broker will be set to publish and subscribe to free educational version accounts with broker "things.ubidots.com".
+```
+setDebug(bool debug);;
+```
+
+> Make available debug messages through the serial port.
 
 ```
 ubidotsSubscribe(char* deviceLabel, char* variableLabel);
