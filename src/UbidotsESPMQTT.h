@@ -74,7 +74,7 @@ class Ubidots {
     bool connected();
     bool loop();
     bool ubidotsSubscribe(char* deviceLabel, char* variableLabel);
-    bool ubidotsPublish(char *sourceLabel);
+    bool ubidotsPublish(char *deviceLabel);
     void ubidotsSetBroker(char* broker);
     void reconnect();
     void setDebug(bool debug);
