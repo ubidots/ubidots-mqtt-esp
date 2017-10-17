@@ -66,6 +66,12 @@ setDebug(bool debug);;
 
 > Make available debug messages through the serial port.
 
+
+```
+ubidotsPublish(char *deviceLabel);
+```
+> Publishes the variables added to the specified device label.
+
 ```
 ubidotsSubscribe(char* deviceLabel, char* variableLabel);
 ```

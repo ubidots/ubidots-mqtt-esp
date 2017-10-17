@@ -147,11 +147,11 @@ bool Ubidots::ubidotsSubscribe(char* deviceLabel, char* variableLabel) {
 }
 
 
-bool Ubidots::ubidotsPublish(char *sourceLabel) {
+bool Ubidots::ubidotsPublish(char *deviceLabel) {
     char topic[150];
     char payload[500];
     String str;
-    sprintf(topic, "%s%s", FIRST_PART_TOPIC, sourceLabel);
+    sprintf(topic, "%s%s", FIRST_PART_TOPIC, deviceLabel);
     sprintf(payload, "{");
     for (int i = 0; i <= currentValue; ) {
         str = String((val+i)->_value, 2);
