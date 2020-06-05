@@ -31,7 +31,7 @@ Modified by: Jose Garcia
 #include <ESP8266WiFi.h>
 
 #define MQTT_PORT 1883
-#define SERVER "things.ubidots.com"
+#define SERVER "industrial.api.ubidots.com"
 #define MAX_VALUES 5
 #define FIRST_PART_TOPIC "/v1.6/devices/"
 #define DEFAULT_DEVICE_LABEL "ESP8266"
