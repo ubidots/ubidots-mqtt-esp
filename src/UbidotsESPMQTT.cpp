@@ -78,7 +78,7 @@ char* Ubidots::getMac(){
     // Obtains the MAC of the device
     Serial.println("entra");
     byte mac[6];
-    WiFi.macAddress(mac);
+    WiFi.macAddress(mac); 
     char macAddr[18];
     sprintf(macAddr, "%2X%2X%2X%2X%2X%2X", mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
     return macAddr;
@@ -191,7 +191,18 @@ bool Ubidots::wifiConnection(char* ssid, char* pass) {
     Serial.println(F("IP address: "));
     Serial.println(WiFi.localIP());
     if(_clientName==NULL){
+        #ifdef ESP8266 
         _clientName = getMac();
+        #endif    
+
+        #ifdef ESP32
+        char macAddr[24];
+        uint64_t chipid = 0LL;
+        chipid = ESP.getEfuseMac(); //The chip ID is essentially its MAC address for esp32
+        uint16_t chip = (uint16_t)(chipid >> 32);
+        snprintf(macAddr, 24, "%04X%08X",chip, (uint32_t)chipid);
+        _clientName = macAddr;
+        #endif
     }
 }
 
