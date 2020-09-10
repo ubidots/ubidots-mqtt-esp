@@ -1,7 +1,6 @@
 /******************************************
  *
- * This example works for both Industrial and STEM users.
- * If you are using the old educational platform,
+ * IMPORTANT: Ubidots will remove the educational platform soon,
  * please consider to migrate your account to a STEM plan
  *
  * ****************************************/
@@ -15,7 +14,7 @@
  * Define Constants
  ****************************************/
 #define TOKEN "....."     // Your Ubidots TOKEN
-#define WIFINAME "....."  // Your SSID
+#define WIFINAME "...."   // Your SSID
 #define WIFIPASS "....."  // Your Wifi Pass
 
 Ubidots client(TOKEN);
@@ -31,11 +30,6 @@ void callback(char* topic, byte* payload, unsigned int length) {
   for (int i = 0; i < length; i++) {
     Serial.print((char)payload[i]);
   }
-  if ((char)payload[0] == '1') {
-    digitalWrite(16, HIGH);
-  } else {
-    digitalWrite(16, LOW);
-  }
   Serial.println();
 }
 
@@ -45,21 +39,25 @@ void callback(char* topic, byte* payload, unsigned int length) {
 
 void setup() {
   // put your setup code here, to run once:
+  client.ubidotsSetBroker("things.ubidots.com");  // Sets the broker properly for the business account
+  client.setDebug(true);                          // Pass a true or false bool value to activate debug messages
   Serial.begin(115200);
-  client.setDebug(true);  // Pass a true or false bool value to activate debug messages
   client.wifiConnection(WIFINAME, WIFIPASS);
   client.begin(callback);
-  pinMode(16, OUTPUT);
-  client.ubidotsSubscribe("esp8266", "temperature");  // Insert the dataSource and Variable's Labels
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
   if (!client.connected()) {
     client.reconnect();
-    client.ubidotsSubscribe("esp8266", "temperature");  // Insert the dataSource and Variable's Labels
   }
-  client.add("stuff", 10);
+
+  // Publish values to 2 different data sources
+
+  client.add("stuff", 10.2);  // Insert your variable Labels and the value to be sent
   client.ubidotsPublish("source1");
+  client.add("stuff", 10.2);
+  client.add("more-stuff", 120.2);
+  client.ubidotsPublish("source2");
   client.loop();
 }
