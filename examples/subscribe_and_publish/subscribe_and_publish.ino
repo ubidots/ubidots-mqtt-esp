@@ -62,4 +62,5 @@ void loop() {
   client.add("stuff", 10);
   client.ubidotsPublish("source1");
   client.loop();
+  delay(5000);
 }

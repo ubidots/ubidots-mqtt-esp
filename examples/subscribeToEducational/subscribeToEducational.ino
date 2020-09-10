@@ -54,4 +54,5 @@ void loop() {
     client.ubidotsSubscribe("esp8266", "temperature");  // Insert the dataSource and Variable's Labels
   }
   client.loop();
+  delay(5000);
 }
