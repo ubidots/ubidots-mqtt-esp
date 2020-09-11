@@ -1,7 +1,6 @@
 /******************************************
  *
- * This example works for both Industrial and STEM users.
- * If you are using the old educational platform,
+ * IMPORTANT: Ubidots will remove the educational platform soon,
  * please consider to migrate your account to a STEM plan
  *
  * ****************************************/
@@ -15,7 +14,7 @@
  * Define Constants
  ****************************************/
 #define TOKEN "....."     // Your Ubidots TOKEN
-#define WIFINAME "....."  // Your SSID
+#define WIFINAME "...."   // Your SSID
 #define WIFIPASS "....."  // Your Wifi Pass
 
 Ubidots client(TOKEN);
@@ -40,8 +39,9 @@ void callback(char* topic, byte* payload, unsigned int length) {
 
 void setup() {
   // put your setup code here, to run once:
+  client.ubidotsSetBroker("things.ubidots.com");  // Sets the broker properly for the business account
+  client.setDebug(true);                          // Pass a true or false bool value to activate debug messages
   Serial.begin(115200);
-  client.setDebug(true);  // Pass a true or false bool value to activate debug messages
   client.wifiConnection(WIFINAME, WIFIPASS);
   client.begin(callback);
 }
