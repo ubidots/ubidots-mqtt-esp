@@ -70,6 +70,10 @@ class Ubidots {
   bool add(char* variableLabel, float value, char* context, char* timestamp);
   void begin(void (*callback)(char*, uint8_t*, unsigned int));
   bool connected();
+  bool connect();
+  bool connect(const char* username, const char* password);
+  bool connect(const char* clientName, const char* username, const char* password);
+  void disconnect();
   bool loop();
   bool ubidotsSubscribe(char* deviceLabel, char* variableLabel);
   bool ubidotsPublish(char* deviceLabel);

@@ -20,6 +20,8 @@ ubidotsSetBroker	KEYWORD2
 reconnect	KEYWORD2
 setDebug	KEYWORD2
 wifiConnection	KEYWORD2
+connect	KEYWORD2
+disconnect	KEYWORD2
 
 #######################################
 # Instances (KEYWORD2)
