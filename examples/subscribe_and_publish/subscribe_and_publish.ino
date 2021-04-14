@@ -4,6 +4,8 @@
  * If you are using the old educational platform,
  * please consider to migrate your account to a STEM plan
  *
+ * Developed by Jose Garcia, https://github.com/jotathebest/
+ *
  * ****************************************/
 
 /****************************************
