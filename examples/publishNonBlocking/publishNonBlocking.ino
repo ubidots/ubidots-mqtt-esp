@@ -4,6 +4,8 @@
  * If you are using the old educational platform,
  * please consider to migrate your account to a STEM plan
  *
+ * Developed by Jose Garcia, https://github.com/jotathebest/
+ *
  * ****************************************/
 
 /****************************************
@@ -35,6 +37,12 @@ void callback(char* topic, byte* payload, unsigned int length) {
 }
 
 /****************************************
+ * Auxiliar variables
+ ****************************************/
+
+bool connected = false;
+
+/****************************************
  * Main Functions
  ****************************************/
 
@@ -48,22 +56,21 @@ void setup() {
 
 void loop() {
   // put your main code here, to run repeatedly:
-  if (!client.connected()) {
-    bool conn = client.connect();
-    while (!conn) {
-      Serial.print(".");
-      delay(500);
-      conn = client.connect();
-    }
+  connected = client.connected();
+  if (!connected) {
+    Serial.println("Not connected, attempting to connect ...");
+    connected = client.connect();
   }
 
   // Publish values to 2 different data sources
 
-  client.add("stuff", 10.2);  // Insert your variable Labels and the value to be sent
-  client.ubidotsPublish("source1");
-  client.add("stuff", 10.2);
-  client.add("more-stuff", 120.2);
-  client.ubidotsPublish("source2");
-  client.loop();
+  if (connected) {
+    client.add("stuff", 10.2);  // Insert your variable Labels and the value to be sent
+    client.ubidotsPublish("source1");
+    client.add("stuff", 10.2);
+    client.add("more-stuff", 120.2);
+    client.ubidotsPublish("source2");
+    client.loop();
+  }
   delay(5000);
 }
