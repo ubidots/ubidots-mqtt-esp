@@ -206,4 +206,5 @@ bool Ubidots::wifiConnection(char* ssid, char* pass) {
   Serial.println(F("WiFi connected"));
   Serial.println(F("IP address: "));
   Serial.println(WiFi.localIP());
+  return true;
 }
