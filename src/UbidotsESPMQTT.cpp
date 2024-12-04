@@ -161,6 +161,13 @@ bool Ubidots::add(char* variableLabel, float value, char* context, char* timesta
 
 void Ubidots::begin(void (*callback)(char*, uint8_t*, unsigned int)) {
   this->callback = callback;
+  Serial.println("Client name is: ");
+  Serial.println(_clientName);
+  if (strcmp(_clientName, "00:00:00:00:00:00") == 0) {
+    String _deviceMac = WiFi.macAddress();
+    strcpy(_clientName, _deviceMac.c_str());
+    Serial.println("Empty client name, using device MAC as client name");
+  } 
   _client.setServer(_server, MQTT_PORT);
   _client.setCallback(callback);
 }
